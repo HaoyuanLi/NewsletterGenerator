@@ -1,0 +1,6 @@
+c:\Users\Haoyuan\Documents\Visual Studio 2015\Projects\NewsletterGenerator\NewsletterGenerator\obj\Debug\NewsletterGenerator.csprojResolveAssemblyReference.cache
+C:\Users\Haoyuan\Documents\Visual Studio 2015\Projects\NewsletterGenerator\NewsletterGenerator\bin\NewsletterGenerator.dll.config
+C:\Users\Haoyuan\Documents\Visual Studio 2015\Projects\NewsletterGenerator\NewsletterGenerator\bin\NewsletterGenerator.dll
+C:\Users\Haoyuan\Documents\Visual Studio 2015\Projects\NewsletterGenerator\NewsletterGenerator\bin\NewsletterGenerator.pdb
+C:\Users\Haoyuan\Documents\Visual Studio 2015\Projects\NewsletterGenerator\NewsletterGenerator\obj\Debug\NewsletterGenerator.dll
+C:\Users\Haoyuan\Documents\Visual Studio 2015\Projects\NewsletterGenerator\NewsletterGenerator\obj\Debug\NewsletterGenerator.pdb
