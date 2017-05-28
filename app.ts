@@ -10,11 +10,11 @@ class Greeter {
         this.element.innerHTML += "The time is: ";
         this.span = document.createElement('span');
         this.element.appendChild(this.span);
-        this.span.innerText = new Date().toUTCString();
+        this.span.innerText = new Date().toTimeString();
     }
 
     start() {
-        this.timerToken = setInterval(() => this.span.innerHTML = new Date().toUTCString(), 500);
+        this.timerToken = setInterval(() => this.span.innerHTML = new Date().toTimeString(), 500);
     }
 
     stop() {
@@ -32,106 +32,81 @@ class Greeter {
     calendarFetcher(url: string): any {
         var res = new XMLHttpRequest();
         var content;
-        var result;
         var arrayOfRes;
-        var startTime;
-        var startDate;
-        var objectTBParsed;
+        var singleEvent;
         var finalLink;
-        var startTimeTwo;
-        var startDateTwo;
-        var tableLink;
         var finalLoc;
-
         var arrayOfEvents = [];
+        var finalHTML = "";
+        var coreBody;
         res.overrideMimeType('application/xml');
-
-
+       
 
         res.onreadystatechange = function () {
             if (res.readyState == 4 && res.status == 200) {
                 var finalRes = res.response;
 
-                //result = document.getElementById('result');
-                //startDate = document.getElementById('startDate');
-                //startTime = document.getElementById('startTime');
-                startDateTwo = document.getElementById('startDate2');
-                startTimeTwo = document.getElementById('startTime2');
-                tableLink = document.getElementById('titleLink2');
+
                 finalLoc = document.getElementById('finalLocation');
-                //result.innerHTML = res.response;
+                coreBody = document.getElementById('coreBody');
 
                 var arrayOfRes = finalRes.split("document.write");
 
                 for (let i = 0; i < arrayOfRes.length; i++) {
                     if (arrayOfRes[i].includes('bwitem')) {
-                        objectTBParsed = arrayOfRes[i];
+                        singleEvent = arrayOfRes[i];
                         arrayOfEvents.push(arrayOfRes[i]);
                     }
                 }
 
-                console.log("see the events: " + arrayOfEvents);
 
-                // the following code analyses one item
-                var objectsParsed = objectTBParsed.split("</div>");
+                for (let i = 0; i < arrayOfEvents.length; i++) {
 
-                // the following part parses clickable link
-                var titleAndLink = objectsParsed[0];
-                var newLink = titleAndLink.split("<a");
-                finalLink = "<a" + newLink[1];
-                console.log(finalLink);
-                //result.innerHTML = finalLink;
-                tableLink.innerHTML = finalLink;
+                    // the following code analyses one item
+                    var objectsParsed = arrayOfEvents[i].split("</div>");
 
-                //console.log("parsed url and some other stuff: " + objectsParsed[0]);
-                //console.log("TO BE PARSED: " + objectTBParsed);
+                    // the following part parses start date
+                    var timeAndDate = objectsParsed[1];
+                    var newTime = timeAndDate.split("2017");
+                    console.log("currentTime: " + newTime[0]);
+                    var date = newTime[0];
+                    var newDate = date.split('bwdescription');
+                    var newNewDate = newDate[1].split(' ');
+                    var dateOfMonth = newNewDate[2].replace(',', '');
+                    var finalDate = newNewDate[1] + ' ' + dateOfMonth;
+                    finalHTML = finalHTML + "&lt;tr&gt;" + "&lt;td&gt;" + finalDate + "&lt;/td&gt;";
+                    
 
+                    //the following part deals with time
+                    var time = newTime[1];
+                    var finalTime = time.split("-");
+                    var finalFinalTime = finalTime[0];
+                    finalHTML = finalHTML + "&lt;td&gt;" + finalFinalTime + "&lt;/td&gt;";
 
-                // the following part parses start date
-                var timeAndDate = objectsParsed[1];
-                var newTime = timeAndDate.split("2017");
-                console.log("currentTime: " + newTime[0]);
-                var date = newTime[0];
-                var newDate = date.split('bwdescription');
-                var newNewDate = newDate[1].split(' ');
-                var dateOfMonth = newNewDate[2].replace(',', '');
-                var finalDate = newNewDate[1] + ' ' + dateOfMonth;
-                //startDate.innerHTML = finalDate;
-                startDateTwo.innerHTML = finalDate;
+                    // the following part parses clickable link
+                    var titleAndLink = objectsParsed[0];
+                    var newLink = titleAndLink.split("<a");
+                    finalLink = "<a" + newLink[1];
+                    console.log(finalLink);
+                    finalHTML = finalHTML + "&lt;td&gt;" + finalLink + "&lt;/td&gt;";
 
-                //the following part deals with time
-                var time = newTime[1];
-                var finalTime = time.split("-");
-                var finalFinalTime = finalTime[0];
-                //startTime.innerHTML = finalFinalTime;
-                startTimeTwo.innerHTML = finalFinalTime;
-
-                //the following part deals with location
-                finalLoc.innerHTML = "See description";
-                }
+                    //the following part deals with location
+                    finalHTML = finalHTML + "&lt;td&gt;" + "See description" + "&lt;/td&gt;" + "&lt;/tr&gt;";
+                    
+                } // end of for loop
+                coreBody.innerHTML = finalHTML;
+            }
         }
         res.open("GET", url, true);
         res.send();
     }
-
-    // takes in multiple events and split them. Iterate through all events by calling singleItemGenerator
-    // Return a <tr></tr> table
-    multipleItemsGenerator() {
-
-    }
-
-    // analyzes one single event and output its source HTML code
-    // return a <td></td> table
-    singleItemGenerator() {
-
-    }
-
-
 }
 
 window.onload = () => {
     var el = document.getElementById('content');
     var greeter = new Greeter(el);
+    var clicked = document.getElementById('userRequest');
+    clicked.addEventListener("click", validateRequest)
     greeter.start();
 };
 

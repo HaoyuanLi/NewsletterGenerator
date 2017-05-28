@@ -5,11 +5,11 @@ var Greeter = (function () {
         this.element.innerHTML += "The time is: ";
         this.span = document.createElement('span');
         this.element.appendChild(this.span);
-        this.span.innerText = new Date().toUTCString();
+        this.span.innerText = new Date().toTimeString();
     }
     Greeter.prototype.start = function () {
         var _this = this;
-        this.timerToken = setInterval(function () { return _this.span.innerHTML = new Date().toUTCString(); }, 500);
+        this.timerToken = setInterval(function () { return _this.span.innerHTML = new Date().toTimeString(); }, 500);
     };
     Greeter.prototype.stop = function () {
         clearTimeout(this.timerToken);
@@ -23,89 +23,66 @@ var Greeter = (function () {
     Greeter.prototype.calendarFetcher = function (url) {
         var res = new XMLHttpRequest();
         var content;
-        var result;
         var arrayOfRes;
-        var startTime;
-        var startDate;
-        var objectTBParsed;
+        var singleEvent;
         var finalLink;
-        var startTimeTwo;
-        var startDateTwo;
-        var tableLink;
         var finalLoc;
         var arrayOfEvents = [];
+        var finalHTML = "";
+        var coreBody;
         res.overrideMimeType('application/xml');
         res.onreadystatechange = function () {
             if (res.readyState == 4 && res.status == 200) {
                 var finalRes = res.response;
-                //console.log("response 1: " + res.responseXML);
-                //console.log("response 2: " + res.response);
-                //result = document.getElementById('result');
-                //startDate = document.getElementById('startDate');
-                //startTime = document.getElementById('startTime');
-                startDateTwo = document.getElementById('startDate2');
-                startTimeTwo = document.getElementById('startTime2');
-                tableLink = document.getElementById('titleLink2');
                 finalLoc = document.getElementById('finalLocation');
-                //result.innerHTML = res.response;
+                coreBody = document.getElementById('coreBody');
                 var arrayOfRes = finalRes.split("document.write");
                 for (var i = 0; i < arrayOfRes.length; i++) {
                     if (arrayOfRes[i].includes('bwitem')) {
-                        objectTBParsed = arrayOfRes[i];
+                        singleEvent = arrayOfRes[i];
                         arrayOfEvents.push(arrayOfRes[i]);
                     }
                 }
-                console.log("see the events: " + arrayOfEvents);
-                // the following code analyses one item
-                var objectsParsed = objectTBParsed.split("</div>");
-                // the following part parses clickable link
-                var titleAndLink = objectsParsed[0];
-                var newLink = titleAndLink.split("<a");
-                finalLink = "<a" + newLink[1];
-                console.log(finalLink);
-                //result.innerHTML = finalLink;
-                tableLink.innerHTML = finalLink;
-                //console.log("parsed url and some other stuff: " + objectsParsed[0]);
-                //console.log("TO BE PARSED: " + objectTBParsed);
-                // the following part parses start date
-                var timeAndDate = objectsParsed[1];
-                var newTime = timeAndDate.split("2017");
-                console.log("currentTime: " + newTime[0]);
-                var date = newTime[0];
-                var newDate = date.split('bwdescription');
-                var newNewDate = newDate[1].split(' ');
-                var dateOfMonth = newNewDate[2].replace(',', '');
-                var finalDate = newNewDate[1] + ' ' + dateOfMonth;
-                //startDate.innerHTML = finalDate;
-                startDateTwo.innerHTML = finalDate;
-                //the following part deals with time
-                var time = newTime[1];
-                var finalTime = time.split("-");
-                var finalFinalTime = finalTime[0];
-                //startTime.innerHTML = finalFinalTime;
-                startTimeTwo.innerHTML = finalFinalTime;
-                //the following part deals with location
-                finalLoc.innerHTML = "See description";
+                for (var i = 0; i < arrayOfEvents.length; i++) {
+                    // the following code analyses one item
+                    var objectsParsed = arrayOfEvents[i].split("</div>");
+                    // the following part parses start date
+                    var timeAndDate = objectsParsed[1];
+                    var newTime = timeAndDate.split("2017");
+                    console.log("currentTime: " + newTime[0]);
+                    var date = newTime[0];
+                    var newDate = date.split('bwdescription');
+                    var newNewDate = newDate[1].split(' ');
+                    var dateOfMonth = newNewDate[2].replace(',', '');
+                    var finalDate = newNewDate[1] + ' ' + dateOfMonth;
+                    finalHTML = finalHTML + "&lt;tr&gt;" + "&lt;td&gt;" + finalDate + "&lt;/td&gt;";
+                    //the following part deals with time
+                    var time = newTime[1];
+                    var finalTime = time.split("-");
+                    var finalFinalTime = finalTime[0];
+                    finalHTML = finalHTML + "&lt;td&gt;" + finalFinalTime + "&lt;/td&gt;";
+                    // the following part parses clickable link
+                    var titleAndLink = objectsParsed[0];
+                    var newLink = titleAndLink.split("<a");
+                    finalLink = "<a" + newLink[1];
+                    console.log(finalLink);
+                    finalHTML = finalHTML + "&lt;td&gt;" + finalLink + "&lt;/td&gt;";
+                    //the following part deals with location
+                    finalHTML = finalHTML + "&lt;td&gt;" + "See description" + "&lt;/td&gt;" + "&lt;/tr&gt;";
+                } // end of for loop
+                coreBody.innerHTML = finalHTML;
             }
         };
         res.open("GET", url, true);
         res.send();
-        //console.log("sth: " + res.responseXML);
-        //console.log(content);
-        //return content;
-        /*var separatedSentences = content.split('document.write');
-
-        for (let i = 0; i < separatedSentences.length; i++) {
-            console.log("number" + i + "th: " + separatedSentences[i]);
-        }*/
-        /*var result = document.getElementById('result');
-        result.innerHTML = content;*/
     };
     return Greeter;
 }());
 window.onload = function () {
     var el = document.getElementById('content');
     var greeter = new Greeter(el);
+    var clicked = document.getElementById('userRequest');
+    clicked.addEventListener("click", validateRequest);
     greeter.start();
 };
 function validateRequest() {
